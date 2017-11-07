@@ -1,25 +1,25 @@
 import axios from 'axios';
 import config from '../../config';
 
-const SCHEDULER = config.dev.servers.scheduler;
+const CONTROLLER = config.dev.servers.controller;
 
 function auth() {
-  if (SCHEDULER.token) {
-    return Promise.resolve(SCHEDULER.token);
+  if (CONTROLLER.token) {
+    return Promise.resolve(CONTROLLER.token);
   }
-  return axios.post(`${SCHEDULER.host}/auth`, {
+  return axios.post(`${CONTROLLER.host}/auth`, {
     service: 'backoffice',
-    passphrase: SCHEDULER.passphrase,
+    passphrase: CONTROLLER.passphrase,
   }).then((response) => {
-    SCHEDULER.token = response.data.token;
-    return Promise.resolve(SCHEDULER.token);
+    CONTROLLER.token = response.data.token;
+    return Promise.resolve(CONTROLLER.token);
   });
 }
 
 export default {
   get(path) {
     return auth().then(token => axios.get(
-      `${SCHEDULER.host}/api/v1${path}`,
+      `${CONTROLLER.host}/api/v1${path}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -32,7 +32,7 @@ export default {
   },
   query(path, params) {
     return auth().then(token => axios.get(
-      `${SCHEDULER.host}/api/v1${path}`,
+      `${CONTROLLER.host}/api/v1${path}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
